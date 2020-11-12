@@ -19,12 +19,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
         <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -126,9 +132,11 @@
                     <h1 class="menu-title">identity</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -157,46 +165,91 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#identityrs" id="identityrs">Identity.rs</a></h1>
-<p>This is a work-in-progress library for Digital Identity on IOTA. It follows the Decentralized Identifiers (DIDs) and Verifiable Credentials standards created by the W3C. The concept of digital identity allows people, businesses, devices and anything else to identify themselves online, while remaining fully in control of this process.</p>
-<p><strong>WARNING: THE CURRENT VERSION IS FEATURE INCOMPLETE AND WILL STILL UNDERGO MASSIVE CHANGES</strong>
-If you are interested in using this project or contributing, join our <a href="https://discord.iota.org">Discord</a> and visit the channel #identity-dev. </p>
-<h2><a class="header" href="#prerequisits" id="prerequisits">Prerequisits</a></h2>
-<p>TODO</p>
-<h2><a class="header" href="#decentralized-identifers-did" id="decentralized-identifers-did">Decentralized Identifers (DID)</a></h2>
-<p>This DID implementation is based on <a href="https://w3c-ccg.github.io/did-spec/">v0.13 of the DID specification from W3C</a>.
-DID's are authenticated using the <a href="https://github.com/WebOfTrustInfo/rwot6-santabarbara/blob/master/final-documents/did-auth.md">DID-Authentication protocol</a>, which proves to an inspection party that they are communicating with the owner of the DID.
-<a href="https://w3c-ccg.github.io/did-spec/#did-documents">According to the DID specification</a> a DID Document is outputted when a DID is resolved. 
-This DID Document may be stored on IOTA, however this is immutabily stored and <strong>might</strong> contain personal data according to the GDPR. 
-It is therefore recommended that any DID's that represent people, will not be published on the Tangle, while issueing entities and devices should publish these to IOTA. </p>
-<p>To create, retrieve and manage DID Documents look at the <a href="../src/DID/README.html">DID Documention</a>.</p>
-<h2><a class="header" href="#verifiable-credentials" id="verifiable-credentials">Verifiable Credentials</a></h2>
-<p>Verifiable Credentials are implemented according to the <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data Model 1.0 by W3C Community Group</a> standard.
-Verifiable Credentials works closely together with the DID standard. Where a DID can just be authenticated, Verifiable Credentials can add verifiable attributes to the identifier. 
-The acquisition, communication, management and storage of Verifiable Credentials are out of the scope of this implementation. 
-For a general introduction to the concept, please <a href="https://www.w3.org/TR/vc-data-model/#what-is-a-verifiable-credential">read the explanation on the specification page</a>.</p>
-<p>To create and verify Verifiable Credentials look at the <a href="../src/VC/README.html">Verifiable Credentials Documentation</a>.</p>
-<h2><a class="header" href="#verifiable-presentations" id="verifiable-presentations">Verifiable Presentations</a></h2>
-<p>To prevent a replay-attack where another party can also pass on the credential as if it is talking about their DID, Verifiable Presentation are introduced. 
-The <a href="https://www.w3.org/TR/vc-data-model/#presentations">Verifiable Presentation data model</a> groups a set of excisting Verifiable Credentials of the subject together for the inspecting party and adds a signature, including a challenge from the inspecting party. It is therefore recommended to not communicate credentials directly, but rather presentations.</p>
-<h2><a class="header" href="#schematics-of-credentials" id="schematics-of-credentials">Schematics of Credentials</a></h2>
-<p>TODO: Describe schematics</p>
-<h2><a class="header" href="#encryption-techniques" id="encryption-techniques">Encryption techniques</a></h2>
-<p>TODO: Describe current Encryption techniques and wanted / planned techniques.</p>
-<h2><a class="header" href="#future-of-this-project" id="future-of-this-project">Future of this project</a></h2>
-<p>Identity will be used for:</p>
+                        <p><img src=".././.meta/identity_banner.png" alt="banner" /></p>
+<p align="center">
+  <a href="https://discord.iota.org/" style="text-decoration:none;"><img src="https://img.shields.io/badge/Discord-9cf.svg?logo=discord" alt="Discord"></a>
+  <a href="https://iota.stackexchange.com/" style="text-decoration:none;"><img src="https://img.shields.io/badge/StackExchange-9cf.svg?logo=stackexchange" alt="StackExchange"></a>
+  <a href="https://github.com/iotaledger/identity.rs/blob/master/LICENSE" style="text-decoration:none;"><img src="https://img.shields.io/github/license/iotaledger/bee.svg" alt="Apache 2.0 license"></a>
+</p>
+<p align="center">
+  <a href="../index.html#introduction">Introduction</a> ◈
+  <a href="../index.html#warning">Warning</a> ◈
+  <a href="../index.html#planned-milestones">Planned Milestones</a> ◈  
+  <a href="../index.html#roadmap">Roadmap</a> ◈
+  <a href="../index.html#joining-the-discussion">Joining the discussion</a>
+</p>
+<hr />
+<h2><a class="header" href="#introduction" id="introduction">Introduction</a></h2>
+<p>IOTA Identity is an implementation of decentralized digital identity also known as Self Sovereign Identity (SSI). It implements standards such as <a href="https://www.w3.org/TR/did-core/">DID</a> and <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials</a> from W3C and other related (proposed) standards. This framework can be utilized to create and authenticate digital identities, creating a trusted connection and sharing verifiable information, establishing trust in the digital world. </p>
+<p>The individual libraries are developed to be agnostic of Distributed Ledger Technology (DLT), with the exception of the IOTA integration and higher level libraries. Written in stable rust, it has strong guarantees of memory safety, process integrity while maintaining performance. </p>
+<h2><a class="header" href="#warning" id="warning">Warning</a></h2>
+<p>This library is currently under development and is not yet ready to be used for anything. It is currently feature incomplete and cannot be considered alpha. Use at your own peril. Until a formal third-party security audit has taken place, the IOTA Foundation makes no guarantees to the fitness of this library for any purposes.</p>
+<p>As such they are to be seen as <strong>experimental</strong> and not ready for real-world applications.</p>
+<p>Nevertheless, we are very interested in feedback about the design and implementation, and encourage you to reach out with any concerns or suggestions you may have.</p>
+<h2><a class="header" href="#planned-milestones" id="planned-milestones">Planned Milestones</a></h2>
+<p>At the current state, the framework is not fit for any projects, however as the framework matures we expect to support more and more type of applications. We recommend no use in real-world applications until the consumed libraries are audited, but experimentation and Proof-of-Concept projects are encouraged at the different stages.</p>
+<p><strong>Current Stage: 0</strong></p>
+<p><strong>Stage 1: DID (Q4 2020)</strong></p>
+<p>As the DID standard is implemented and the IOTA ledger is integrated the first experimentations are possible. DIDs can be created, updated and ownership can be proven. This allows simple experimentations where ownership of an identity is the main requirement. </p>
+<p><strong>Stage 2: Verifiable Credentials (Q4 2020)</strong></p>
+<p>With the Verifiable Credentials standard implemented, not only ownership can be proven, but also other attributes. At this stage PoCs are possible similarly to <a href="https://selv.iota.org">Selv</a>. However, the communications between actors are not yet implemented, identities are not easily recognized nor are credential layouts standardized. Real-world applications are possible at this stage (after audit), but require extra effort.</p>
+<p><strong>Stage 3: Communication Standardization (Q1 2021)</strong></p>
+<p>Once the communications between DID actors have been implemented, any application using identity can communicate out-of-the-box in an interoperable manner. This makes applications easier to develop, yet as mentioned in Stage 2, identities are still not easily recognized nor are the credential layouts standarized. Real-world applications are therefore easier to develop (after audit), but scaling the application outside of a consortium is difficult.</p>
+<p>Stage 4: TBD</p>
+<h2><a class="header" href="#roadmap" id="roadmap">Roadmap</a></h2>
+<h3><a class="header" href="#documentation-and-specification" id="documentation-and-specification">Documentation and Specification</a></h3>
 <ul>
-<li>Replace physical documents</li>
-<li>Improved KYC</li>
-<li>Replace passwords</li>
-<li>IoT Security</li>
-<li>Access Control</li>
-<li>Trust</li>
-<li>Smart Cities</li>
-<li>Vehicle Identities (VID)</li>
+<li><input disabled="" type="checkbox"/>
+Examples</li>
+<li><input disabled="" type="checkbox"/>
+Specification Documentation</li>
 </ul>
-<h2><a class="header" href="#api-reference" id="api-reference">API Reference</a></h2>
-<p>TODO: Add Module overview</p>
+<h3><a class="header" href="#basic-framework" id="basic-framework">Basic Framework</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"/>
+DID Document Manager (Under active development)</li>
+<li><input disabled="" type="checkbox"/>
+IOTA Integration (Under active development)</li>
+<li><input disabled="" type="checkbox"/>
+Resolver (Under active development)</li>
+<li><input disabled="" type="checkbox"/>
+Stronghold Integration</li>
+<li><input disabled="" type="checkbox"/>
+DID Comms</li>
+<li><input disabled="" type="checkbox"/>
+Verifiable Credentials</li>
+<li><input disabled="" type="checkbox"/>
+VC Comms</li>
+<li><input disabled="" type="checkbox"/>
+Schema Validation</li>
+<li><input disabled="" type="checkbox"/>
+C FFI Bindings</li>
+<li><input disabled="" type="checkbox"/>
+Javascript FFI Bindings</li>
+</ul>
+<h3><a class="header" href="#extended-features-2021" id="extended-features-2021">Extended Features (2021+)</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"/>
+Mobile App Wrapper</li>
+<li><input disabled="" type="checkbox"/>
+Credential standardization</li>
+<li><input disabled="" type="checkbox"/>
+Identity Agent</li>
+<li><input disabled="" type="checkbox"/>
+Pairwise DIDs</li>
+<li><input disabled="" type="checkbox"/>
+Zero Knowledge Proofs</li>
+<li><input disabled="" type="checkbox"/>
+Trust Fabric</li>
+<li><input disabled="" type="checkbox"/>
+eId Integrations</li>
+<li><input disabled="" type="checkbox"/>
+IoT reputation system</li>
+<li><input disabled="" type="checkbox"/>
+Identity for Objects</li>
+</ul>
+<h2><a class="header" href="#joining-the-discussion" id="joining-the-discussion">Joining the discussion</a></h2>
+<p>If you want to get involved in discussions about this framework, or you're looking for support, go to the #identity-discussion channel on <a href="http://discord.iota.org">Discord</a>.</p>
 <h1><a class="header" href="#glossary" id="glossary">Glossary</a></h1>
 <p>The first part describes the terminology by the W3C.
 The second part describes the terminology for IOTA related topics.</p>
@@ -264,14 +317,43 @@ The second part describes the terminology for IOTA related topics.</p>
 In addition to the terminology above, this specification also uses terminology from the [INFRA] specification to formally define the abstract data model. When [INFRA] terminology is used, such as string, ordered set, and map, it is linked directly to that specification.</p>
 <h1><a class="header" href="#meeting-notes" id="meeting-notes">Meeting Notes</a></h1>
 <h2><a class="header" href="#next-meeting" id="next-meeting">Next Meeting</a></h2>
-<p>Wednesday 29 Jul 2020 17:00 to 18:00 Central European Time - Berlin</p>
-<ul>
-<li><a href="meeting-notes/./2020-07-29.html">2020-07-29</a></li>
-</ul>
+<p>Wednesday, 2020-09-16 - 17:00 to 18:00 (CEST) </p>
 <h2><a class="header" href="#past-meetings" id="past-meetings">Past Meetings</a></h2>
 <ul>
+<li><a href="meeting-notes/./2020-09-09.html">2020-09-09</a></li>
+<li><a href="meeting-notes/./2020-09-02.html">2020-09-02</a></li>
+<li><a href="meeting-notes/./2020-08-19.html">2020-08-19</a></li>
+<li><a href="meeting-notes/./2020-08-12.html">2020-08-12</a></li>
+<li><a href="meeting-notes/./2020-08-07.html">2020-08-07</a></li>
+<li><a href="meeting-notes/./2020-08-05.html">2020-08-05</a></li>
+<li><a href="meeting-notes/./2020-07-29.html">2020-07-29</a></li>
 <li><a href="meeting-notes/./2020-07-28.html">2020-07-28</a></li>
 <li><a href="meeting-notes/./2020-07-27.html">2020-07-27</a></li>
+</ul>
+<h2><a class="header" href="#meeting-workflows" id="meeting-workflows">Meeting Workflows</a></h2>
+<h3><a class="header" href="#pre-meeting" id="pre-meeting">Pre Meeting</a></h3>
+<p>Add your topics as comment to the specific pull request (recognizable by the label <code>meeting</code>) </p>
+<h3><a class="header" href="#while-the-meeting" id="while-the-meeting">While the Meeting</a></h3>
+<ul>
+<li>Add the meeting notes to the hackmd file.
+<ul>
+<li>Edit <code>Participants</code></li>
+<li>Notice questions and decisions</li>
+<li>KISS - <a href="https://en.wikipedia.org/wiki/KISS_principle">keep it stupid simple</a></li>
+</ul>
+</li>
+</ul>
+<h3><a class="header" href="#after-the-meeting" id="after-the-meeting">After the Meeting</a></h3>
+<p><em>Finish the Meeting</em></p>
+<ul>
+<li>Copy the content from the hackmd file to the prepared file and push it to the specific branch.</li>
+<li>Make the pull request <code>Ready for review</code> on GitHub.</li>
+</ul>
+<p><em>Prepare the next meeting</em></p>
+<ul>
+<li>Create a new file from the <a href="meeting-notes/_template.html">template</a> with the current date as filename.</li>
+<li>Create a new branch (in draft mode) with the name <code>(upcoming) meeting/&lt;date&gt;</code>, create a pull request and tag it with `meeting``</li>
+<li>Create a new <a href="https://hackmd.io/">hackmd</a> file, add the template content and link it to the pull request description.</li>
 </ul>
 
                     </main>
