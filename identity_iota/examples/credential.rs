@@ -34,7 +34,7 @@ impl User {
         let response: PublishDocumentResponse = client.create_document(&doc).trace(true).send().await?;
 
         println!("[+] Doc > {:#}", doc);
-        println!("[+]   {}", client.transaction_url(&response.tail));
+        println!("[+]   {}", client.message_url(response.hash));
         println!("[+]");
 
         Ok(Self {
@@ -79,7 +79,7 @@ impl User {
 async fn main() -> Result<()> {
     let client: Client = ClientBuilder::new()
         .network(Network::Mainnet)
-        .node("https://nodes.thetangle.org:443")
+        .node("http://localhost:14265")
         .build()?;
 
     let issuer: User = User::new("Issuer", &client).await?;

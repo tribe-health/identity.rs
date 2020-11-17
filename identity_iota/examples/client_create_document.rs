@@ -88,7 +88,7 @@ async fn main() -> Result<()> {
 
     println!("[+]");
     println!("[+] DID Document Published >");
-    println!("[+]   {}", client.transaction_url(&response.tail));
+    println!("[+]   {}", client.message_url(response.hash));
     println!("[+]");
 
     let response: ReadDocumentResponse = client

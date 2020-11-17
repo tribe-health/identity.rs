@@ -12,8 +12,6 @@ pub enum Error {
     ProofError(#[from] identity_proof::error::Error),
     #[error(transparent)]
     ClientError(#[from] iota::client::error::Error),
-    #[error(transparent)]
-    TernaryError(#[from] iota::ternary::Error),
     #[error("Invalid DID Method")]
     InvalidMethod,
     #[error("Invalid DID Method ID")]
@@ -26,16 +24,10 @@ pub enum Error {
     InvalidAuthenticationKey,
     #[error("Invalid DID Proof")]
     InvalidProof,
-    #[error("Invalid Tryte Conversion")]
-    InvalidTryteConversion,
-    #[error("Invalid Transaction Bundle")]
-    InvalidTransactionBundle,
-    #[error("Invalid Transaction Hashes")]
-    InvalidTransactionHashes,
-    #[error("Invalid Transaction Trytes")]
-    InvalidTransactionTrytes,
-    #[error("Invalid Transfer Tail")]
-    InvalidTransferTail,
+    #[error("Invalid Message")]
+    InvalidMessage,
     #[error("Transfer Unconfirmable")]
     TransferUnconfirmable,
+    #[error("No messages found")]
+    NoMessages,
 }

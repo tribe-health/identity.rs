@@ -12,14 +12,12 @@ use identity_core::{
 };
 use identity_crypto::{KeyPair, SecretKey};
 use identity_proof::{signature::jcsed25519signature2020, HasProof, LdRead, LdSignature, LdWrite, SignatureOptions};
-use iota::transaction::bundled::Address;
-use multihash::{Blake2b256, MultihashGeneric};
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
     did::{DIDDiff, IotaDID},
     error::{Error, Result},
-    utils::{create_address_from_trits, utf8_to_trytes},
 };
 
 #[derive(Clone, PartialEq, Deserialize, Serialize)]
@@ -209,30 +207,6 @@ impl IotaDocument {
         }
 
         Ok(())
-    }
-
-    pub fn diff_address_hash(&self) -> String {
-        Self::create_diff_address_hash(&self.authentication_key_bytes())
-    }
-
-    pub fn diff_address(&self) -> Result<Address> {
-        create_address_from_trits(self.diff_address_hash())
-    }
-
-    /// Creates an 81 Trytes IOTA address from public key bytes for a diff
-    pub fn create_diff_address_hash(public_key: &[u8]) -> String {
-        let hash: MultihashGeneric<_> = Blake2b256::digest(public_key);
-        let hash: MultihashGeneric<_> = Blake2b256::digest(hash.digest());
-
-        let mut trytes: String = utf8_to_trytes(&encode_b58(hash.digest()));
-
-        trytes.truncate(iota_constants::HASH_TRYTES_SIZE);
-
-        trytes
-    }
-
-    pub fn create_diff_address(public_key: &[u8]) -> Result<Address> {
-        create_address_from_trits(Self::create_diff_address_hash(public_key))
     }
 
     fn check_authentication_key_id(authentication: &PublicKey, did: &IotaDID) -> Result<()> {

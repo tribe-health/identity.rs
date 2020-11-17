@@ -1,39 +1,27 @@
-use core::fmt::{Debug, Formatter, Result as FmtResult};
+use core::fmt::Debug;
 use identity_core::common::ToJson as _;
-use iota::{
-    client::Transfer,
-    transaction::bundled::{Address, BundledTransaction, BundledTransactionField as _},
-};
+use iota::Indexation;
 
 use crate::{
-    client::{SendTransferRequest, SendTransferResponse, TransactionPrinter},
+    client::{SendMessageRequest, SendMessageResponse},
     did::{IotaDID, IotaDocument},
     error::{Error, Result},
-    utils::encode_trits,
 };
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 #[repr(transparent)]
 pub struct PublishDocumentResponse {
-    pub tail: BundledTransaction,
-}
-
-impl Debug for PublishDocumentResponse {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.debug_struct("PublishDocumentResponse")
-            .field("tail", &TransactionPrinter::full(&self.tail))
-            .finish()
-    }
+    pub hash: String,
 }
 
 #[derive(Debug)]
 pub struct PublishDocumentRequest<'a, 'b> {
-    pub(crate) transfer: SendTransferRequest<'a>,
+    pub(crate) transfer: SendMessageRequest<'a>,
     pub(crate) document: &'b IotaDocument,
 }
 
 impl<'a, 'b> PublishDocumentRequest<'a, 'b> {
-    pub const fn new(transfer: SendTransferRequest<'a>, document: &'b IotaDocument) -> Self {
+    pub const fn new(transfer: SendMessageRequest<'a>, document: &'b IotaDocument) -> Self {
         Self { transfer, document }
     }
 
@@ -64,24 +52,13 @@ impl<'a, 'b> PublishDocumentRequest<'a, 'b> {
         // Verify the document signature with the authentication key.
         self.document.verify()?;
 
-        // Create a tangle address from the DID.
-        let address: Address = did.create_address()?;
+        // Create a transfer to publish the DID document with the specified indexation tag.
 
-        if self.transfer.trace {
-            println!("[+] trace(3): Tangle Address: {:?}", encode_trits(address.to_inner()));
-        }
-
-        // Create a transfer to publish the DID document at the specified address.
-        let transfer: Transfer = Transfer {
-            address,
-            value: 0,
-            message: Some(self.document.to_json()?),
-            tag: None,
-        };
+        let index = Indexation::new(did.method_id().into(), self.document.to_json()?.as_bytes()).unwrap();
 
         // Submit the transfer to the tangle.
-        let response: SendTransferResponse = self.transfer.send(transfer).await?;
+        let response: SendMessageResponse = self.transfer.send(index).await?;
 
-        Ok(PublishDocumentResponse { tail: response.tail })
+        Ok(PublishDocumentResponse { hash: response.hash })
     }
 }

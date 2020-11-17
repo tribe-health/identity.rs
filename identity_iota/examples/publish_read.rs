@@ -1,6 +1,7 @@
 //! Publish new did document and read it from the tangle
 //! cargo run --example publish_read
 
+use identity_core::resolver::resolve;
 use identity_crypto::KeyPair;
 use identity_iota::{
     client::{Client, ClientBuilder},
@@ -13,9 +14,9 @@ use identity_iota::{
 async fn main() -> Result<()> {
     let client: Client = ClientBuilder::new()
         .node("http://localhost:14265")
-        .node("https://nodes.thetangle.org:443")
-        .node("https://iotanode.us:14267")
-        .node("https://pow.iota.community:443")
+        // .node("https://nodes.thetangle.org:443")
+        // .node("https://iotanode.us:14267")
+        // .node("https://pow.iota.community:443")
         .network(Network::Mainnet)
         .build()?;
 
@@ -32,7 +33,7 @@ async fn main() -> Result<()> {
 
     let response = client.create_document(&document).send().await?;
 
-    println!("DID document published: {}", client.transaction_url(&response.tail));
+    println!("DID document published: {}", client.message_url(response.hash.clone()));
 
     // Update document and publish diff to the Tangle
     let mut update = document.clone();
@@ -44,6 +45,9 @@ async fn main() -> Result<()> {
     // Ensure the diff proof is valid
     assert!(document.verify_diff(&signed_diff).is_ok());
 
+    let res = resolve(&document.did().to_string(), Default::default(), &client).await?;
+
+    println!("Document from Tangle: {:?}", res);
     // let tail_transaction = tangle_writer.publish_json(&document.did(), &signed_diff).await?;
 
     // println!(

@@ -1,9 +1,9 @@
 //!
-//! cargo run --example client_read_transactions
+//! cargo run --example client_read_messages
 use identity_core::utils::{decode_b58, encode_b58};
 use identity_crypto::KeyPair;
 use identity_iota::{
-    client::{Client, ClientBuilder, ReadTransactionsResponse},
+    client::{Client, ClientBuilder, ReadMessagesResponse},
     did::IotaDID,
     error::Result,
     network::Network,
@@ -29,17 +29,17 @@ async fn main() -> Result<()> {
 
     let client: Client = ClientBuilder::new()
         .network(Network::Comnet)
-        .node("https://nodes.comnet.thetangle.org:443")
+        .node("http://localhost:14265")
         .build()?;
 
     println!("[+] Client > {:#?}", client);
     println!("[+]");
 
-    let response: ReadTransactionsResponse = client
-        .read_transactions(&did)
+    let response: ReadMessagesResponse = client
+        .read_messages(&did)
         // enable trace debug messages
         .trace(true)
-        // read transactions from the tangle
+        // read messages from the tangle
         .send()
         .await?;
 

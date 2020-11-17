@@ -1,13 +1,12 @@
 use identity_core::common::{FromJson as _, Object};
-use iota::transaction::bundled::{Address, BundledTransactionField as _};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    client::{Client, ReadTransactionsRequest, ReadTransactionsResponse, TangleMessage},
+    client::{Client, ReadMessagesRequest, ReadMessagesResponse},
     did::{IotaDID, IotaDocument},
     error::{Error, Result},
-    utils::encode_trits,
 };
+use iota::{Message, Payload};
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct ReadDocumentResponse {
@@ -37,35 +36,19 @@ impl<'a, 'b> ReadDocumentRequest<'a, 'b> {
     }
 
     pub async fn send(self) -> Result<ReadDocumentResponse> {
-        let target_id: &str = self.did.method_id();
-
-        if self.trace {
-            println!("[+] trace(1): Target Id: {:?}", target_id);
-        }
-
-        // Create a document tangle address from the DID.
-        let address: Address = self.did.create_address()?;
-
-        if self.trace {
-            println!(
-                "[+] trace(2): AuthChain Address: {:?}",
-                encode_trits(address.to_inner())
-            );
-        }
-
         // Fetch all messages for the auth chain.
-        let request: ReadTransactionsRequest = ReadTransactionsRequest::new(self.client, address);
-        let response: ReadTransactionsResponse = request.trace(self.trace).send().await?;
+        let request: ReadMessagesRequest = ReadMessagesRequest::new(self.client, self.did.clone());
+        let response: ReadMessagesResponse = request.trace(self.trace).send().await?;
 
         if self.trace {
-            println!("[+] trace(3): Tangle Documents: {:?}", response);
+            println!("[+] trace(1): Tangle Documents: {:?}", response);
         }
 
         let document: Option<IotaDocument> = self.extract_auth_document(response.messages);
-        let document: IotaDocument = document.ok_or(Error::InvalidTransactionBundle)?;
+        let document: IotaDocument = document.ok_or(Error::InvalidMessage)?;
 
         if self.trace {
-            println!("[+] trace(4): Auth Document: {:?}", document);
+            println!("[+] trace(2): Auth Document: {:?}", document);
         }
 
         if document.has_diff_chain() {
@@ -78,7 +61,7 @@ impl<'a, 'b> ReadDocumentRequest<'a, 'b> {
         })
     }
 
-    fn extract_auth_document(&self, messages: Vec<TangleMessage>) -> Option<IotaDocument> {
+    fn extract_auth_document(&self, messages: Vec<Message>) -> Option<IotaDocument> {
         let documents: Vec<IotaDocument> = self.extract_auth_chain(messages);
 
         let (mut initials, mut additionals): (Vec<IotaDocument>, Vec<IotaDocument>) =
@@ -98,14 +81,17 @@ impl<'a, 'b> ReadDocumentRequest<'a, 'b> {
         Some(initial)
     }
 
-    fn extract_auth_chain(&self, messages: Vec<TangleMessage>) -> Vec<IotaDocument> {
+    fn extract_auth_chain(&self, messages: Vec<Message>) -> Vec<IotaDocument> {
         let mut documents: Vec<IotaDocument> = Vec::with_capacity(messages.len());
 
         for message in messages {
-            let document: Option<IotaDocument> = message
-                .message_utf8()
-                .ok()
-                .and_then(|json| IotaDocument::from_json(&json).ok());
+            let document = match message.payload().as_ref().unwrap() {
+                Payload::Indexation(i) => {
+                    let doc = String::from_utf8(hex::decode(&i.data()).unwrap()).expect("Found invalid UTF-8");
+                    IotaDocument::from_json(&doc).ok()
+                }
+                _ => panic!("No indexation payload"),
+            };
 
             if let Some(document) = document {
                 // Only include documents matching the target DID

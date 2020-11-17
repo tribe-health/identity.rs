@@ -13,9 +13,9 @@ use identity_iota::{
 async fn main() -> Result<()> {
     let client: Client = ClientBuilder::new()
         .node("http://localhost:14265")
-        .node("https://nodes.thetangle.org:443")
-        .node("https://iotanode.us:14267")
-        .node("https://pow.iota.community:443")
+        // .node("https://nodes.thetangle.org:443")
+        // .node("https://iotanode.us:14267")
+        // .node("https://pow.iota.community:443")
         .network(Network::Mainnet)
         .build()?;
 
@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
 
     let response = client.create_document(&document).send().await?;
 
-    println!("DID document published: {}", client.transaction_url(&response.tail));
+    println!("DID document published: {}", client.message_url(response.hash));
 
     Ok(())
 }

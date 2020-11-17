@@ -1,20 +1,14 @@
+use crate::{
+    client::{ClientBuilder, PublishDocumentRequest, ReadDocumentRequest, ReadMessagesRequest, SendMessageRequest},
+    did::{IotaDID, IotaDocument},
+    error::Result,
+    network::Network,
+};
 use async_trait::async_trait;
-use core::slice::from_ref;
 use identity_core::{
     did::DID,
     error::{Error, Result as CoreResult},
     resolver::{DocumentMetadata, InputMetadata, MetaDocument, ResolverMethod},
-};
-use iota::{crypto::ternary::Hash, transaction::bundled::BundledTransaction};
-
-use crate::{
-    client::{
-        ClientBuilder, PublishDocumentRequest, ReadDocumentRequest, ReadTransactionsRequest, SendTransferRequest,
-        TransactionPrinter,
-    },
-    did::{IotaDID, IotaDocument},
-    error::Result,
-    network::Network,
 };
 
 #[derive(Clone, Debug)]
@@ -24,12 +18,8 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn transaction_url(&self, transaction: &BundledTransaction) -> String {
-        format!(
-            "{}transaction/{}",
-            self.network.explorer_url(),
-            TransactionPrinter::hash(transaction)
-        )
+    pub fn message_url(&self, message_id: String) -> String {
+        format!("{}message/{}", self.network.explorer_url(), message_id)
     }
 
     pub fn new() -> Result<Self> {
@@ -51,31 +41,40 @@ impl Client {
         })
     }
 
-    pub fn read_transactions<'a>(&'a self, did: &IotaDID) -> ReadTransactionsRequest<'a> {
-        ReadTransactionsRequest::new(self, did.create_address().unwrap())
+    pub fn read_messages<'a>(&'a self, did: &IotaDID) -> ReadMessagesRequest<'a> {
+        ReadMessagesRequest::new(self, did.clone())
     }
 
-    pub fn send_transfer(&self) -> SendTransferRequest {
-        SendTransferRequest::new(self)
+    pub fn send_indexation(&self) -> SendMessageRequest {
+        SendMessageRequest::new(self)
     }
 
     pub fn create_document<'a, 'b>(&'a self, document: &'b IotaDocument) -> PublishDocumentRequest<'a, 'b> {
-        PublishDocumentRequest::new(self.send_transfer(), document)
+        PublishDocumentRequest::new(self.send_indexation(), document)
     }
 
     pub fn read_document<'a, 'b>(&'a self, did: &'b IotaDID) -> ReadDocumentRequest<'a, 'b> {
         ReadDocumentRequest::new(self, did)
     }
 
-    pub async fn is_transaction_confirmed(&self, hash: &Hash) -> Result<bool> {
-        self.client
-            .get_inclusion_states()
-            .transactions(from_ref(hash))
-            .send()
-            .await
-            .map_err(Into::into)
-            .map(|states| states.states.as_slice() == [true])
-    }
+    // Doesn't work at the moment
+    // pub async fn is_message_confirmed(&self, message_id: &str) -> Result<bool> {
+    //     let response = self
+    //         .client
+    //         .get_message()
+    //         .metadata(&hex_to_message_id(message_id)?)
+    //         .await?;
+
+    //     if &response
+    //         .ledger_inclusion_state
+    //         .expect("Missing ledger_inclusion_state field in metadata")
+    //         == "included"
+    //     {
+    //         Ok(true)
+    //     } else {
+    //         Ok(false)
+    //     }
+    // }
 }
 
 #[async_trait(?Send)]

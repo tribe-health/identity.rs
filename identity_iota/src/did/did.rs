@@ -11,14 +11,10 @@ use identity_core::{
 };
 use identity_crypto::KeyPair;
 use identity_proof::signature::jcsed25519signature2020;
-use iota::transaction::bundled::Address;
 use multihash::Blake2b256;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::{Error, Result},
-    utils::{create_address_from_trits, utf8_to_trytes},
-};
+use crate::error::{Error, Result};
 
 // The hash size of BLAKE2b-256 (32-bytes)
 const BLAKE2B_256_LEN: usize = 32;
@@ -151,17 +147,6 @@ impl IotaDID {
         self.0
     }
 
-    /// Creates an 81 Trytes IOTA address from the DID
-    pub fn create_address_hash(&self) -> String {
-        let mut trytes: String = utf8_to_trytes(self.method_id());
-        trytes.truncate(iota_constants::HASH_TRYTES_SIZE);
-        trytes
-    }
-
-    pub fn create_address(&self) -> Result<Address> {
-        create_address_from_trits(self.create_address_hash())
-    }
-
     fn encode_key(key: &[u8]) -> String {
         encode_b58(Blake2b256::digest(key).digest())
     }
@@ -219,31 +204,5 @@ impl FromStr for IotaDID {
 
     fn from_str(string: &str) -> Result<Self, Self::Err> {
         Self::parse(string)
-    }
-}
-
-pub mod deprecated {
-    use identity_core::did::DID;
-    use iota::transaction::bundled::Address;
-
-    use crate::{
-        error::{Error, Result},
-        utils::{create_address_from_trits, utf8_to_trytes},
-    };
-
-    pub fn method_id(did: &DID) -> Result<&str> {
-        did.id_segments
-            .last()
-            .map(|string| string.as_str())
-            .ok_or(Error::InvalidMethodId)
-    }
-
-    /// Creates an 81 Trytes IOTA address from the DID
-    pub fn create_address(did: &DID) -> Result<Address> {
-        let mut trytes: String = utf8_to_trytes(method_id(did)?);
-
-        trytes.truncate(iota_constants::HASH_TRYTES_SIZE);
-
-        create_address_from_trits(trytes)
     }
 }
