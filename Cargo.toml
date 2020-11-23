@@ -8,5 +8,6 @@ members = [
     "identity_proof",
 ]
 exclude = [
-    "libraries/wasm"
+    "libraries/wasm",
+    "libraries/diff"
 ]

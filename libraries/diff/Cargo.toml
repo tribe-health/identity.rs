@@ -1,0 +1,47 @@
+[package]
+name = "diff"
+version = "0.1.0"
+authors = ["IOTA Identity"]
+edition = "2018"
+description = ""
+readme = "../../README.md"
+repository = "https://github.com/iotaledger/identity.rs"
+license = "Apache-2.0"
+keywords = ["iota", "tangle", "identity"]
+homepage = "https://www.iota.org"
+
+[workspace]
+members = ["derive"]
+
+[dependencies]
+internal = { path = "derive", version = "=0.1.0", optional = true }
+serde = { version = "1.0", default-features = false }
+
+# Enable --feature did_url to provide impls for common types from did_url
+did_url = { version = "0.1", default-features = false, features = ["alloc", "serde"], optional = true }
+
+# Enable --feature serde_json to provide impls for common types from serde_json
+serde_json = { version = "1.0", default-features = false, features = ["alloc"], optional = true }
+
+# Enable --feature url to provide impls for common types from url
+url = { version = "2.1", default-features = false, features = ["serde"], optional = true }
+
+# Required when building with JSON patch support
+itoa = { version = "0.4", default-features = false, features = ["std"], optional = true }
+
+[features]
+default = ["std"]
+
+# Provide derive(Diff) macro.
+derive = ["internal"]
+
+# Provide impls for common standard library types like Vec<T> and HashMap<K, V>.
+# Requires a dependency on the Rust standard library.
+std = ["serde/std"]
+
+# Provide impls for types in the Rust core allocation and collections library
+# including String, Box<T>, Vec<T>, and Cow<T>. This is a subset of std but may
+# be enabled without depending on all of std.
+alloc = ["serde/alloc"]
+
+json = ["serde_json", "itoa"]
