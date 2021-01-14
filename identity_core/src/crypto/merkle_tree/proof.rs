@@ -6,6 +6,8 @@ use digest::Digest;
 use crate::crypto::merkle_tree::Node;
 use crate::crypto::merkle_tree::Hash;
 
+#[derive(Deserialize, Serialize)]
+#[serde(bound = "", transparent)]
 pub struct Proof<D: Digest> {
   nodes: Vec<Node<D>>,
 }
