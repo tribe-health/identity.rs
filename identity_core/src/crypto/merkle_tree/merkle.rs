@@ -129,7 +129,7 @@ where
       index = (index - 1) >> 1;
     }
 
-    Some(Proof::new(nodes))
+    Some(Proof::new(nodes.into_boxed_slice()))
   }
 
   pub fn verify(&self, proof: &Proof<D>, hash: Hash<D>) -> bool {

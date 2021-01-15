@@ -8,11 +8,11 @@ use crate::crypto::merkle_tree::Node;
 use crate::crypto::merkle_tree::Hash;
 
 pub struct Proof<D: Digest> {
-  nodes: Vec<Node<D>>,
+  nodes: Box<[Node<D>]>,
 }
 
 impl<D: Digest> Proof<D> {
-  pub fn new(nodes: Vec<Node<D>>) -> Self {
+  pub fn new(nodes: Box<[Node<D>]>) -> Self {
     Self { nodes }
   }
 
