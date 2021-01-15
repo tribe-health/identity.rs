@@ -1,3 +1,4 @@
+use core::convert::TryInto;
 use core::fmt::Debug;
 use core::fmt::Formatter;
 use core::fmt::Result;
@@ -7,6 +8,7 @@ use subtle::ConstantTimeEq;
 
 use crate::crypto::merkle_tree::Node;
 use crate::crypto::merkle_tree::Hash;
+use crate::crypto::merkle_tree::SIZE_U16;
 
 pub struct Proof<D: Digest> {
   nodes: Box<[Node<D>]>,
@@ -35,8 +37,6 @@ impl<D: Digest> Proof<D> {
 
   // [ U16(HASH-LEN) U16(PATH-LEN) [ [ U8(NODE-TAG) | HASH(NODE-PATH) ] ... ] ]
   pub fn encode(&self) -> Vec<u8> {
-    const SIZE_U16: usize = ::core::mem::size_of::<u16>();
-
     let hsize: usize = D::OutputSize::USIZE;
     let psize: usize = self.nodes.len();
 
@@ -54,6 +54,30 @@ impl<D: Digest> Proof<D> {
 
     output
   }
+
+  pub fn decode(slice: &[u8]) -> Option<Self> {
+    if slice.len() < SIZE_U16 << 1 {
+      return None;
+    }
+
+    let hsize: usize = read_u16(&slice[0..2])? as usize;
+    let psize: usize = read_u16(&slice[2..4])? as usize;
+
+    let mut nodes: Vec<Node<D>> = Vec::with_capacity(psize);
+    let mut slice: &[u8] = slice.get(4..)?;
+
+    for _ in 0..psize {
+      let ntag: u8 = slice.get(0).copied()?;
+      let hash: Hash<D> = slice.get(1..1 + hsize).and_then(Hash::from_slice)?;
+      let node: Node<D> = Node::from_tagged(ntag, hash)?;
+
+      nodes.push(node);
+
+      slice = slice.get(1 + hsize..)?;
+    }
+
+    Some(Self::new(nodes.into_boxed_slice()))
+  }
 }
 
 impl<D: Digest> Debug for Proof<D> {
@@ -62,4 +86,14 @@ impl<D: Digest> Debug for Proof<D> {
       .field("nodes", &self.nodes)
       .finish()
   }
+}
+
+fn read_u16(slice: &[u8]) -> Option<u16> {
+  slice
+    .get(0..2)
+    .map(TryInto::try_into)
+    .transpose()
+    .ok()
+    .flatten()
+    .map(u16::from_be_bytes)
 }
