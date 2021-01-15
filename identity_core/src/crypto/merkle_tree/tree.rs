@@ -7,7 +7,7 @@ use crate::crypto::merkle_tree::DigestExt;
 
 #[inline(always)]
 pub fn __height(leaves: usize) -> usize {
-  log2c(leaves + 1) - 1
+  log2c(leaves)
 }
 
 #[inline(always)]

@@ -2,12 +2,11 @@ use core::fmt::Debug;
 use core::fmt::Formatter;
 use core::fmt::Result;
 use digest::Digest;
+use subtle::ConstantTimeEq;
 
 use crate::crypto::merkle_tree::Node;
 use crate::crypto::merkle_tree::Hash;
 
-#[derive(Deserialize, Serialize)]
-#[serde(bound = "", transparent)]
 pub struct Proof<D: Digest> {
   nodes: Vec<Node<D>>,
 }
@@ -22,7 +21,7 @@ impl<D: Digest> Proof<D> {
   }
 
   pub fn verify(&self, root: &Hash<D>, hash: Hash<D>) -> bool {
-    self.root(hash).eq(root)
+    self.root(hash).ct_eq(root).into()
   }
 
   pub fn root(&self, other: Hash<D>) -> Hash<D> {

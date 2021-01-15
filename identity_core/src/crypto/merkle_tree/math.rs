@@ -36,5 +36,5 @@ pub const fn is_pow2(value: usize) -> bool {
 /// ```
 #[inline(always)]
 pub fn log2c(value: usize) -> usize {
-  ((SIZE_USIZE * 8) - 1) - value.next_power_of_two().leading_zeros() as usize
+  (SIZE_USIZE * 8) - value.leading_zeros() as usize - value.is_power_of_two() as usize
 }

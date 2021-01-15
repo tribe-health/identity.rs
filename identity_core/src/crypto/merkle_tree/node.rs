@@ -6,8 +6,6 @@ use digest::Digest;
 use crate::crypto::merkle_tree::Hash;
 use crate::crypto::merkle_tree::DigestExt;
 
-#[derive(Deserialize, Serialize)]
-#[serde(bound = "")]
 pub enum Node<D: Digest> {
   L(Hash<D>),
   R(Hash<D>),
